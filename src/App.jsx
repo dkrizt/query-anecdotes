@@ -1,40 +1,26 @@
-import AnecdoteForm from './components/AnecdoteForm'
-import Notification from './components/Notification'
+import { useQuery } from '@tanstack/react-query';
+import anecdotesService from './services/anecdotes';
+import AnecdoteForm from './components/AnecdoteForm';
+import AnecdoteList from './components/AnecdoteList';
+import Notification from './components/Notification';
 
 const App = () => {
+  const { data: anecdotes = [], isLoading, isError } = useQuery({
+    queryKey: ['anecdotes'],
+    queryFn: anecdotesService.getAll,
+  });
 
-  const handleVote = (anecdote) => {
-    console.log('vote')
-  }
-
-  const anecdotes = [
-    {
-      "content": "If it hurts, do it more often",
-      "id": "47145",
-      "votes": 0
-    },
-  ]
+  if (isLoading) return <div>Loading anecdotes...</div>;
+  if (isError) return <div>Error loading anecdotes!</div>;
 
   return (
     <div>
       <h3>Anecdote app</h3>
-    
       <Notification />
       <AnecdoteForm />
-    
-      {anecdotes.map(anecdote =>
-        <div key={anecdote.id}>
-          <div>
-            {anecdote.content}
-          </div>
-          <div>
-            has {anecdote.votes}
-            <button onClick={() => handleVote(anecdote)}>vote</button>
-          </div>
-        </div>
-      )}
+      <AnecdoteList anecdotes={anecdotes} />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
